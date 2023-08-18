@@ -72,8 +72,9 @@ namespace BilSynd
 
         private static void SomethingCar()
         {
+            Person owner = CreatePerson();
             Car car = CreateCar();
-            car.Owner = CreatePerson();
+            car.Owner = owner;
             carList.Add(car);
 
             //Variable   Condition           True                 False
