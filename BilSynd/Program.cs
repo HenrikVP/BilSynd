@@ -10,9 +10,11 @@ namespace BilSynd
         //static Person[] people = new Person[2];
         //static List<Person> peopleList = new List<Person>();
         static List<Car> carList = new List<Car>();
+        static List<Car> defectCarList = new List<Car>();
 
         static void Main(string[] args)
         {
+            DefectCars();
             while (true) { Menu(); }
         }
 
@@ -27,12 +29,19 @@ namespace BilSynd
 
             switch (Console.ReadKey(true).Key)
             {
+                case ConsoleKey.NumPad1:
                 case ConsoleKey.D1:
                     ShowCars();
                     break;
+                case ConsoleKey.NumPad2:
                 case ConsoleKey.D2:
                     SomethingCar();
                     break;
+                case ConsoleKey.NumPad3:
+                case ConsoleKey.D3:
+                    SearchCar();
+                    break;
+                case ConsoleKey.NumPad4:
                 case ConsoleKey.D4:
                     for (int i = 0; i < 100; i++) Console.WriteLine(GenerateRandomLicensePlate());
                     break;
@@ -42,14 +51,37 @@ namespace BilSynd
             }
         }
 
+        private static void SearchCar()
+        {
+            Console.WriteLine("Søg på nummerplade: ");
+            string input = Console.ReadLine();
+
+            foreach (var car in carList)
+                if (input == car.LicensePlate)
+                {
+                    ShowCustomer(car.Owner);
+                }
+
+            
+        }
+
+        static void ShowCustomer(Person owner)
+        {
+            Console.WriteLine($"Owner: {owner.Firstname} {owner.Lastname} \tPhone number: {owner.PhoneNumber}");
+        }
+
         private static void SomethingCar()
         {
             Car car = CreateCar();
             car.Owner = CreatePerson();
             carList.Add(car);
+
             //Variable   Condition           True                 False
             string str = NeedInspection(car) ? "Bilen skal synes" : "Bilen skal IKKE synes";
             Console.WriteLine(str);
+
+            string? str2 = IsCarDefect(car);
+            if (str2 != null) Console.WriteLine("Bilen har følgende fabriksfejl: " + str2);
         }
         #endregion
 
@@ -61,8 +93,6 @@ namespace BilSynd
             string c = random.Next(1000).ToString("000");
             return a1.ToString() + a2.ToString() + " " + b + " " + c;
         }
-
-        //TODO Search function
 
         static void ShowCars()
         {
@@ -86,7 +116,6 @@ namespace BilSynd
         {
             Console.WriteLine($"\nCar: {car.Brand} {car.Model} \tLicense plate: {car.LicensePlate}");
             Console.WriteLine($"Reg.Date: {car.DateofRegistration.ToString(CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern)} \tLast inspection {car.LastInspection.ToString(CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern)}");
-            Console.WriteLine($"Owner: {car.Owner.Firstname} {car.Owner.Lastname} \tPhone number: {car.Owner.PhoneNumber}");
         }
 
         static Car CreateCar()
@@ -127,6 +156,25 @@ namespace BilSynd
             Console.Write("Telephone number: ");
             person.PhoneNumber = Console.ReadLine();
             return person;
+        }
+
+        static string? IsCarDefect(Car car)
+        {
+            foreach (var defectCar in defectCarList)
+            {
+                if (car.Brand == defectCar.Brand &&
+                    car.Model == defectCar.Model &&
+                    car.ModelYear <= defectCar.ModelYear) return defectCar.ManufacturingDefects;
+            }
+            return null;
+        }
+
+        static void DefectCars()
+        {
+            Car car1 = new Car() { Brand = "Alfa Romeo", Model = "G", ModelYear = 2022, ManufacturingDefects = "Wheels are square" };
+            Car car2 = new Car() { Brand = "Lamborghini", Model = "Countach", ModelYear = 1986, ManufacturingDefects = "Wiper is baaad!" };
+            defectCarList.Add(car1);
+            defectCarList.Add(car2);
         }
     }
 }
